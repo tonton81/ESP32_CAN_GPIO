@@ -19,3 +19,22 @@ To use:
       power.digitalRead(3); // get pin 3 state
       power.setPins(0b11110, HIGH); // set pins 1, 2, 3 & 4 HIGH
 ```
+
+
+Debug output:
+```
+Pin 0(IO14):	0	Toggle: Off	Timer: Off
+Pin 1(RX):	1	Toggle: Off	Timer: Off
+Pin 2(TX):	0	Toggle: Off	Timer: Off
+Pin 3(SCK):	0	Toggle: Off	Timer: Off
+Pin 4(MOSI):	0	Toggle: Off	Timer: Off
+Pin 5(MISO):	0	Toggle: On	Timer: 614 / 2000
+Pin 6(IO21):	0	Toggle: Off	Timer: Off
+Pin 7(SCL):	0	Toggle: Off	Timer: Off
+Pin 8(SDA):	0	Toggle: Off	Timer: Off
+Pin 9(IO13):	0	Toggle: Off	Timer: Off
+Pin 10(IO12):	0	Toggle: Off	Timer: Off
+Pin 11(IO27):	0	Toggle: Off	Timer: Off
+Pin 12(IO33):	0	Toggle: Off	Timer: Off
+Pin 13(IO32):	0	Toggle: Off	Timer: Off
+```
