@@ -5,7 +5,7 @@ For controlling GPIOs over CAN from Teensy to ESP32, using skpang's ESP32's CAN 
 ESP32 board used for this project & code: https://www.skpang.co.uk/products/esp32-can-bus-board
 
 Use this code to control remote relays/mosfets while minimizing wiring in your setup, by controlling your devices remotely.
-
+```
 To use:
   Upload the ESP32 sketch to the ESP32 board.
   On Teensy:
@@ -18,3 +18,4 @@ To use:
       power.digitalWrite(3, LOW); // set pin 3 LOW
       power.digitalRead(3); // get pin 3 state
       power.setPins(0b11110, HIGH); // set pins 1, 2, 3 & 4 HIGH
+```
