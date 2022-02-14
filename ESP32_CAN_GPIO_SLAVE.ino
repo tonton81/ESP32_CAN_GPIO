@@ -84,6 +84,7 @@ void onReceive(const CAN_message_t &msg) {
 
 
 void loop() {
+  vTaskSuspend(CANBUS_TASK); /* prevents the busy for loop from being overwriting the task's pin writes in onReceive callback */
   for ( int i = 0; i < 14; i++ ) {
     if ( ( pins_millis[i] || pins_toggle[i] ) && (millis() - pins_millis[i] > pins_time[i]) ) {
       digitalWrite(pins_array[i], !digitalRead(pins_array[i]));
@@ -91,6 +92,7 @@ void loop() {
       else pins_millis[i] = 0;
     }
   }
+  vTaskResume(CANBUS_TASK);
 
   static uint32_t t = millis();
   if ( debug && millis() - t > 1000 ) {
