@@ -12,7 +12,7 @@ ESP32_CAN_GPIO::ESP32_CAN_GPIO(FlexCAN_T4_Base* _busWritePtr, uint32_t id) {
 
 void ESP32_CAN_GPIO::digitalWrite(uint8_t pin, bool state) {
   CAN_message_t f;
-  f.id = 0x9000;
+  f.id = _id;
   f.flags.extended = (_id > 0x7FF) ? 1 : 0;
   f.buf[0] = 1;
   f.buf[1] = 0;
@@ -24,7 +24,7 @@ void ESP32_CAN_GPIO::digitalWrite(uint8_t pin, bool state) {
 bool ESP32_CAN_GPIO::digitalRead(uint8_t pin) {
   pin = constrain(pin, 0, 13);
   CAN_message_t f;
-  f.id = 0x9000;
+  f.id = _id;
   f.flags.extended = (_id > 0x7FF) ? 1 : 0;
   f.buf[0] = 255;
   _esp32_can_gpio_busToWrite->write(f);
@@ -33,7 +33,7 @@ bool ESP32_CAN_GPIO::digitalRead(uint8_t pin) {
 
 void ESP32_CAN_GPIO::setPins(uint32_t mask, bool state) {
   CAN_message_t f;
-  f.id = 0x9000;
+  f.id = _id;
   f.flags.extended = (_id > 0x7FF) ? 1 : 0;
   f.buf[0] = 2;
   f.buf[1] = mask >> 8;
@@ -44,7 +44,7 @@ void ESP32_CAN_GPIO::setPins(uint32_t mask, bool state) {
 
 void ESP32_CAN_GPIO::toggle(uint8_t pin, bool state, uint16_t time) {
   CAN_message_t f;
-  f.id = 0x9000;
+  f.id = _id;
   f.flags.extended = (_id > 0x7FF) ? 1 : 0;
   f.buf[0] = 1;
   f.buf[1] = 2;
@@ -57,7 +57,7 @@ void ESP32_CAN_GPIO::toggle(uint8_t pin, bool state, uint16_t time) {
 
 void ESP32_CAN_GPIO::timed(uint8_t pin, bool state, uint16_t time) {
   CAN_message_t f;
-  f.id = 0x9000;
+  f.id = _id;
   f.flags.extended = (_id > 0x7FF) ? 1 : 0;
   f.buf[0] = 1;
   f.buf[1] = 1;
