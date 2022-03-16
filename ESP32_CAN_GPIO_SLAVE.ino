@@ -3,6 +3,7 @@ ESP32_CAN<RX_SIZE_256, TX_SIZE_16> Can0;
 
 const bool debug = 1;
 const uint32_t CAN_ID = 0x9000;
+volatile uint32_t CAN_timeout = 0;
 const uint8_t pins_array[14] = { 14, 16, 17, 5, 18, 19, 21, 22, 23, 13, 12, 27, 33, 32 };
 const char* pins_names[14] = { "IO14", "RX", "TX", "SCK", "MOSI", "MISO", "IO21", "SCL", "SDA", "IO13", "IO12", "IO27", "IO33", "IO32" };
 volatile uint32_t pins_millis[14] = { 0 };
@@ -32,9 +33,10 @@ void setup() {
 }
 
 void onReceive(const CAN_message_t &msg) {
+  CAN_timeout = millis();
   if ( msg.id != CAN_ID ) return;
 
-  if ( msg.buf[0] == 0 ) { /* set all GPIOs off or on */
+  if ( msg.buf[0] == 0x50 ) { /* set all GPIOs off or on */
     for ( int i = 0; i < 14; i++ ) {
       digitalWrite(pins_array[i], msg.buf[1]);
       pins_millis[i] = 0;
@@ -70,7 +72,10 @@ void onReceive(const CAN_message_t &msg) {
       }
     }
   }
+  send_update();
+}
 
+void send_update() {
   CAN_message_t frame;
   frame.id = CAN_ID;
   frame.flags.extended = 1;
@@ -82,17 +87,30 @@ void onReceive(const CAN_message_t &msg) {
   Can0.write(frame);
 }
 
-
 void loop() {
-  vTaskSuspend(CANBUS_TASK); /* prevents the busy for loop from being overwriting the task's pin writes in onReceive callback */
+  vTaskSuspend(CANBUS_TASK); /* prevents the busy for loop from overwriting the task's pin writes in the onReceive callback */
+  /* persist deassertion of pins on an idle bus every 3 seconds */
+  if ( millis() - CAN_timeout > 3000 ) {
+    for ( int i = 0; i < 14; i++ ) {
+      digitalWrite(pins_array[i], 0);
+      pins_millis[i] = pins_toggle[i] = 0;
+    }
+    CAN_timeout = millis();
+  }
+
+  /* handle one shot timer or toggling, runs forever */
+  bool changes = 0;
   for ( int i = 0; i < 14; i++ ) {
     if ( ( pins_millis[i] || pins_toggle[i] ) && (millis() - pins_millis[i] > pins_time[i]) ) {
+      changes = 1;
       digitalWrite(pins_array[i], !digitalRead(pins_array[i]));
       if ( pins_toggle[i] ) pins_millis[i] = millis();
       else pins_millis[i] = 0;
     }
   }
   vTaskResume(CANBUS_TASK);
+
+  if ( changes ) send_update();
 
   static uint32_t t = millis();
   if ( debug && millis() - t > 1000 ) {
